@@ -65,6 +65,7 @@ class GameWindow < Gosu::Window
         @bx2,@by2= GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
         @loose = false
         @lives = 3
+      when 12,53 then exit
     end
 
     unless @loose
