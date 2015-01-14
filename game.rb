@@ -54,11 +54,12 @@ class GameWindow < Gosu::Window
   def draw
 
     case @pressed
-      when 123 then @x = @x-3
-      when 124 then @x = @x+3
-      # when 125 then @y = @y+3
-      # when 126 then @y = @y-3
-      when 45 then
+      # now also runs on linux
+      when 123, 105 then @x = @x-3
+      when 124, 106 then @x = @x+3
+      # when 125, 108 then @y = @y+3
+      # when 126, 103 then @y = @y-3
+      when 45, 49 then
         @x,@y=300,400
         @bx,@by= GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
         @bx2,@by2= GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
