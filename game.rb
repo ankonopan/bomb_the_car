@@ -55,6 +55,11 @@ class GameWindow < Gosu::Window
         end
       end
 
+      @x = 0 if (@x < 0)
+      @x = 600 if (@x > 600)
+      @y = 0 if (@y < 0)
+      @y = 460 if (@y > 460)
+
       if @etime > 0
         @explosion.draw(@ex,@ey,1)
         @etime =@etime -1
