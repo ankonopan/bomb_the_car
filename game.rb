@@ -21,6 +21,7 @@ class GameWindow < Gosu::Window
     @loose = false
   end
 
+  # update
   def update
   end
 
@@ -43,6 +44,10 @@ class GameWindow < Gosu::Window
         @bx=rand(640)
         @points = @points +1
       end
+      
+      if (@loose)
+        exit
+      end
 
       if (@by+20 > @y && @y+15 > @by) && (@bx+20 > @x && @bx < @x+38 )
         @ex,@ey=@x,@y-25
@@ -54,6 +59,13 @@ class GameWindow < Gosu::Window
           @loose = true
         end
       end
+
+      # make x zero if it is less than zero
+      @x = 0 if (@x < 0)
+      
+      @x = 600 if (@x > 600)
+      @y = 0 if (@y < 0)
+      @y = 460 if (@y > 460)
 
       if @etime > 0
         @explosion.draw(@ex,@ey,1)
