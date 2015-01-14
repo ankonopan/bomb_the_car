@@ -9,7 +9,9 @@ GAME_PARAMS={
   },
   lives: 3,
   max_point_level: 200,
-  x_init_place: lambda { rand(640) }
+  x_init_place: lambda { rand(640) },
+  y_init_place: lambda { -rand(10) },
+  bullet_speed: lambda { rand(4) + 2 }
 }
 
 class GameWindow < Gosu::Window
@@ -21,12 +23,12 @@ class GameWindow < Gosu::Window
     self.caption = "Bomb the Car. Uhhhh"
 
     # initializing a bullet
-    @bullet, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/bullet.png", 20, 20, false)
+    @bullet, @walk1, @walk2, @jump = Gosu::Image.new(self, "images/bullet.png", false)
     # initializing a second bullet
-    @bullet2, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/bullet.png", 20, 20, false)
+    @bullet2, @walk2, @walk3, @jump1 = Gosu::Image.new(self, "images/bullet2.png", false)
 
-    @standing, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/car.png", 38, 15, false)
-    @explosion, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/explosion.png", 50, 50, false)
+    @standing, @walk1, @walk2, @jump = Gosu::Image.new(self, "images/car.png", false)
+    @explosion, @walk1, @walk2, @jump = Gosu::Image.new(self, "images/explosion.png", false)
 
     # Initializing Texts
     @points_text = Gosu::Font.new(self, Gosu::default_font_name, 20)
@@ -36,11 +38,13 @@ class GameWindow < Gosu::Window
 
     # INit Parameters
     @x, @y = 300, 400
-    @bx, @by = GAME_PARAMS[:x_init_place].call, 400
+    @bx, @by = GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
+    @bx2, @by2 = GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
     @points=0
     @lives=3
     @etime = 0
     @loose = false
+    @bullet_speed = GAME_PARAMS[:bullet_speed].call
   end
 
   # update
@@ -56,19 +60,28 @@ class GameWindow < Gosu::Window
       # when 126 then @y = @y-3
       when 45 then
         @x,@y=300,400
-        @bx,@by= GAME_PARAMS[:x_init_place].call, 0
+        @bx,@by= GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
+        @bx2,@by2= GAME_PARAMS[:x_init_place].call, GAME_PARAMS[:y_init_place].call
         @loose = false
         @lives = 3
     end
 
     unless @loose
-      @by = @by+4
+      @by = @by+ @bullet_speed
+      @by2 = @by2+ @bullet_speed
+
       if @by > 480
         @by=0
         @bx=GAME_PARAMS[:x_init_place].call
         @points = @points +1
       end
-      
+
+      if @by2 > 480
+        @by2=0
+        @bx2=GAME_PARAMS[:x_init_place].call
+        @points = @points +1
+      end
+
       if (@loose)
         exit
       end
@@ -77,6 +90,20 @@ class GameWindow < Gosu::Window
         @ex,@ey=@x,@y-25
         @x,@y=300,400
         @bx,@by= GAME_PARAMS[:x_init_place].call, 0
+        @bullet_speed = GAME_PARAMS[:bullet_speed].call
+        @etime = 20
+        @lives= @lives-1
+        if @lives < 1
+          @loose = true
+        end
+      end
+
+
+      if (@by2+20 > @y && @y+15 > @by2) && (@bx2+20 > @x && @bx2 < @x+38 )
+        @ex,@ey=@x,@y-25
+        @x,@y=300,400
+        @bx2,@by2= GAME_PARAMS[:x_init_place].call, 0
+        @bullet_speed = GAME_PARAMS[:bullet_speed].call
         @etime = 20
         @lives= @lives-1
         if @lives < 1
@@ -86,16 +113,17 @@ class GameWindow < Gosu::Window
 
       # make x zero if it is less than zero
       @x = 0 if (@x < 0)
-      
+
       @x = 600 if (@x > 600)
-      @y = 0 if (@y < 0)
-      @y = 460 if (@y > 460)
+      # @y = 0 if (@y < 0)
+      # @y = 460 if (@y > 460)
 
       if @etime > 0
         @explosion.draw(@ex,@ey,1)
         @etime =@etime -1
       else
         @bullet.draw(@bx, @by, 0.5)
+        @bullet2.draw(@bx2, @by2, 0.5)
         @standing.draw(@x, @y, 1)
       end
     else
