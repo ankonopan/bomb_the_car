@@ -2,19 +2,41 @@ require 'gosu'
 require 'pry'
 include Gosu
 
+GAME_PARAMS={
+  window:{
+    width: 640,
+    height: 480
+  },
+  lives: 3,
+  max_point_level: 200,
+  x_init_place: lambda { rand(640) }
+}
+
 class GameWindow < Gosu::Window
+
+
+  # initializing the Window
   def initialize
-    super(640, 480, false)
-    self.caption = "Jump 'n Run"
+    super(GAME_PARAMS[:window][:width], GAME_PARAMS[:window][:height], false)
+    self.caption = "Bomb the Car. Uhhhh"
+
+    # initializing a bullet
     @bullet, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/bullet.png", 20, 20, false)
+    # initializing a second bullet
+    @bullet2, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/bullet.png", 20, 20, false)
+
     @standing, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/car.png", 38, 15, false)
     @explosion, @walk1, @walk2, @jump = Gosu::Image.load_tiles(self, "images/explosion.png", 50, 50, false)
+
+    # Initializing Texts
     @points_text = Gosu::Font.new(self, Gosu::default_font_name, 20)
     @lives_text = Gosu::Font.new(self, Gosu::default_font_name, 20)
     @game_over = Gosu::Font.new(self, Gosu::default_font_name, 40)
     @restart = Gosu::Font.new(self, Gosu::default_font_name, 11)
+
+    # INit Parameters
     @x, @y = 300, 400
-    @bx, @by = rand(640), 400
+    @bx, @by = GAME_PARAMS[:x_init_place].call, 400
     @points=0
     @lives=3
     @etime = 0
@@ -25,29 +47,31 @@ class GameWindow < Gosu::Window
   end
 
   def draw
+
     case @pressed
       when 123 then @x = @x-3
       when 124 then @x = @x+3
-      when 125 then @y = @y+3
-      when 126 then @y = @y-3
+      # when 125 then @y = @y+3
+      # when 126 then @y = @y-3
       when 45 then
         @x,@y=300,400
-        @bx,@by= rand(640), 0
+        @bx,@by= GAME_PARAMS[:x_init_place].call, 0
         @loose = false
         @lives = 3
     end
+
     unless @loose
       @by = @by+4
       if @by > 480
         @by=0
-        @bx=rand(640)
+        @bx=GAME_PARAMS[:x_init_place].call
         @points = @points +1
       end
 
       if (@by+20 > @y && @y+15 > @by) && (@bx+20 > @x && @bx < @x+38 )
         @ex,@ey=@x,@y-25
         @x,@y=300,400
-        @bx,@by= rand(640), 0
+        @bx,@by= GAME_PARAMS[:x_init_place].call, 0
         @etime = 20
         @lives= @lives-1
         if @lives < 1
