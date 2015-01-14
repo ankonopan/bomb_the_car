@@ -130,7 +130,7 @@ class GameWindow < Gosu::Window
       end
     else
       @game_over.draw("Game Over", 220, 220, 3.0, 1.0, 1.0, 0xffffffff)
-      @game_over.draw("restart press 'n' ", 250, 250, 3.0, 1.0, 1.0, 0xffffffff)
+      @restart.draw("restart press 'n' ", 250, 250, 3.0, 1.0, 1.0, 0xffffffff)
     end
 
     @points_text.draw("Points: #{@points}", 10, 10, 3.0, 1.0, 1.0, 0xffffffff)
